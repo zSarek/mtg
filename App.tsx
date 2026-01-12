@@ -88,7 +88,7 @@ const App: React.FC = () => {
         )}
 
         {status === LoadingState.SUCCESS && (
-          <div className="space-y-4 animate-fade-in">
+          <div className="space-y-2 animate-fade-in">
             
             <div className="flex justify-center">
                <RuleSelector 

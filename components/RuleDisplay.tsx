@@ -73,7 +73,7 @@ const RuleDisplay: React.FC<Props> = ({ rule, cachedExplanation, onCache }) => {
         
         {/* Official Rules Text (Oracle Text style) */}
         <div className="p-6 bg-[#1f1d1d]">
-          <div className="text-sm text-gray-300 leading-relaxed font-sans opacity-95">
+          <div className="text-sm text-gray-300 leading-relaxed font-sans opacity-95 italic">
              {rule.fullText.length > 0 ? (
                 rule.fullText.map((paragraph, index) => (
                   <p key={index} className="mb-2 last:mb-0">
@@ -110,7 +110,7 @@ const RuleDisplay: React.FC<Props> = ({ rule, cachedExplanation, onCache }) => {
           )}
 
           {loading && (
-            <div className="flex flex-col items-center justify-center py-12 space-y-4">
+            <div className="flex flex-col items-center justify-center py-12 gap-6">
               <LoadingSpinner />
               <p className="text-mtg-accent text-sm animate-pulse font-fantasy tracking-widest uppercase">Consulting the Oracle...</p>
             </div>

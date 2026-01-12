@@ -54,6 +54,18 @@ const parseRulesText = (text: string): RuleItem[] => {
     line = line.trim();
     if (!line) continue;
 
+    // SECURITY BREAK: Stop parsing if we reach section 703 or higher.
+    // This prevents "leaking" of the rest of the document into the last rule.
+    // CRITICAL FIX: Only break if we have actually started collecting rules (currentRule is set).
+    // This prevents breaking early due to Table of Contents at the top of the file which might list "703.".
+    const sectionMatch = line.match(/^(\d{3})\./);
+    if (sectionMatch) {
+      const sectionNum = parseInt(sectionMatch[1], 10);
+      if (sectionNum > 702 && state.currentRule !== null) {
+        break; 
+      }
+    }
+
     // Check if it is a Main Header (New Rule)
     const headerMatch = line.match(headerRegex);
     if (headerMatch) {

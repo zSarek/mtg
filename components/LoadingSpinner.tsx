@@ -1,7 +1,8 @@
 import React from 'react';
 
 const LoadingSpinner: React.FC = () => (
-  <div className="relative flex justify-center items-center">
+  // Added h-16 w-16 so the container takes up physical space matching the largest ring
+  <div className="relative flex justify-center items-center h-16 w-16">
     {/* Outer ring */}
     <div className="absolute animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
     {/* Inner ring */}
