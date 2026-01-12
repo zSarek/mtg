@@ -10,6 +10,9 @@ const App: React.FC = () => {
   const [selectedRuleId, setSelectedRuleId] = useState<string>('');
   const [status, setStatus] = useState<LoadingState>(LoadingState.IDLE);
   const [errorMsg, setErrorMsg] = useState<string>('');
+  
+  // Cache for storing AI explanations: RuleID -> Explanation HTML/Markdown
+  const [explanationCache, setExplanationCache] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const loadData = async () => {
@@ -31,6 +34,13 @@ const App: React.FC = () => {
     rules.find(r => r.id === selectedRuleId), 
   [rules, selectedRuleId]);
 
+  const handleCacheUpdate = (ruleId: string, explanation: string) => {
+    setExplanationCache(prev => ({
+      ...prev,
+      [ruleId]: explanation
+    }));
+  };
+
   return (
     <div className="min-h-screen bg-mtg-dark text-mtg-text font-sans selection:bg-mtg-accent selection:text-black pb-20">
       
@@ -44,7 +54,7 @@ const App: React.FC = () => {
         </div>
       </header>
 
-      {/* Main Content - Restored standard padding (px-4) */}
+      {/* Main Content */}
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {status === LoadingState.LOADING && (
@@ -78,7 +88,11 @@ const App: React.FC = () => {
             />
 
             {selectedRule ? (
-              <RuleDisplay rule={selectedRule} />
+              <RuleDisplay 
+                rule={selectedRule}
+                cachedExplanation={explanationCache[selectedRule.id]}
+                onCache={(explanation) => handleCacheUpdate(selectedRule.id, explanation)}
+              />
             ) : (
               <div className="text-center py-20 opacity-30">
                 <div className="text-6xl mb-4 grayscale">📜</div>

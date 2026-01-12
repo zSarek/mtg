@@ -26,7 +26,7 @@ export const explainRule = async (ruleName: string, ruleText: string): Promise<s
       4. Wyświetlane odpowiedzi bedą w oknie w telefonie, więc bądź w odpowiedziach wizualny.
       5. Używaj kolorów i odpowiedniego formatowania, aby odpowiedź nie była ścianą tekstu.
       6. Bądź czytelny w odpowiedzi. Używaj przerw pomiędzy strukturami w odpowiedzi.
-      7. Jeśli to pomoże, używaj kolorów.
+      7. Jeśli to pomoże, używaj kolorów i emoji.
 
       STRUKTURA ODPOWIEDZI:
       1. Pierwsze zdanie ma jak najkrocej podsumowac zdolnosc.
