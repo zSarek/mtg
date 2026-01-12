@@ -28,6 +28,8 @@ export const explainRule = async (ruleName: string, ruleText: string): Promise<s
       2. Prosty przykład sytuacji z gry.
       3. Wyświetlane odpowiedzi bedą w oknie w telefonie, więc bądź w odpowiedziach wizualny.
       4. Używaj kolorów i odpowiedniego formatowania, aby odpowiedź nie była ścianą tekstu.
+      5. Bądź czytelny w odpowiedzi. Używaj przerw w tekscie pomiędzy sekcjami.
+      6. Jeśli to pomoże, używaj kolorów.
       
       Odpowiadaj po polsku, zachowując angielskie terminy gry.
     `;
