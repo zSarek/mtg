@@ -41,56 +41,75 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen font-sans text-mtg-text pb-20 overflow-x-hidden">
+    <div className="min-h-screen pb-20 overflow-x-hidden relative">
       
-      {/* Header with Glassmorphism */}
-      <header className="sticky top-0 z-20 backdrop-blur-md bg-mtg-dark/80 border-b border-mtg-border shadow-lg">
+      {/* Ambient Eclipse Glows */}
+      <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] bg-mtg-accent opacity-[0.03] blur-[120px] rounded-full pointer-events-none z-0"></div>
+      <div className="fixed bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-mtg-eclipse opacity-[0.05] blur-[120px] rounded-full pointer-events-none z-0"></div>
+
+      {/* Header */}
+      <header className="sticky top-0 z-30 bg-[#0f1216]/90 backdrop-blur-sm border-b border-mtg-border/50 shadow-glow-purple">
         <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            {/* Planeswalker Spark Icon (Simple SVG) */}
-            <svg className="w-8 h-8 text-mtg-accent" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" />
-            </svg>
-            <h1 className="text-xl md:text-2xl font-fantasy font-bold tracking-wider text-white bg-clip-text">
-              MTG <span className="text-mtg-accent">Rules Companion</span>
-            </h1>
+          <div className="flex items-center gap-3 group cursor-default">
+            {/* Stylized Eclipse Icon */}
+            <div className="relative w-10 h-10 flex items-center justify-center">
+              <div className="absolute inset-0 bg-mtg-accent rounded-full opacity-20 group-hover:opacity-40 transition-opacity blur-md"></div>
+              <svg className="w-8 h-8 text-mtg-accent drop-shadow-[0_0_8px_rgba(220,177,88,0.5)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" className="opacity-50" />
+                <path d="M12 3C7 3 3 7 3 12C3 17 7 21 12 21" stroke="currentColor" strokeWidth="2" />
+                <path d="M12 2L12 4M12 20L12 22M4.93 4.93L6.34 6.34M17.66 17.66L19.07 19.07M2 12L4 12M20 12L22 12M4.93 19.07L6.34 17.66M17.66 6.34L19.07 4.93" stroke="currentColor" className="opacity-70" />
+              </svg>
+            </div>
+            
+            <div className="flex flex-col">
+              <h1 className="text-2xl font-fantasy font-bold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-mtg-accent via-[#f5e3a8] to-mtg-accent drop-shadow-sm">
+                LORWYN
+              </h1>
+              <span className="text-[10px] tracking-[0.3em] uppercase text-mtg-eclipse font-bold -mt-1 ml-0.5">Rules Codex</span>
+            </div>
           </div>
-          <div className="text-[10px] sm:text-xs text-gray-500 font-mono hidden sm:block uppercase tracking-widest">
-            AI Powered Judge
+          
+          <div className="hidden sm:block">
+            <div className="px-3 py-1 rounded-full border border-mtg-border/50 bg-black/20 text-xs text-mtg-accent/70 font-fantasy tracking-wider">
+              Cycle: Eclipse
+            </div>
           </div>
         </div>
-        {/* Mystic Line */}
-        <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-mtg-accent to-transparent opacity-50"></div>
+        
+        {/* Vine/Separator Line */}
+        <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-mtg-leaf to-transparent opacity-60"></div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 relative z-10">
         
         {status === LoadingState.LOADING && (
-          <div className="flex flex-col items-center pt-20">
+          <div className="flex flex-col items-center pt-24 min-h-[50vh]">
             <LoadingSpinner />
-            <p className="text-mtg-accent font-fantasy mt-6 text-lg animate-pulse">Summoning Knowledge...</p>
+            <p className="text-mtg-accent font-fantasy mt-8 text-2xl animate-pulse tracking-widest drop-shadow-glow-gold">
+              Communing with Nature...
+            </p>
           </div>
         )}
 
         {status === LoadingState.ERROR && (
-          <div className="bg-red-950/30 border border-red-800 text-red-200 p-6 rounded-xl text-center max-w-lg mx-auto mt-10 shadow-2xl backdrop-blur-sm">
-            <div className="text-4xl mb-4">💀</div>
-            <h3 className="font-fantasy font-bold text-xl mb-2">Fizzled</h3>
-            <p className="mb-4">{errorMsg}</p>
+          <div className="bg-red-950/20 border border-red-900/50 text-red-200 p-8 rounded-2xl text-center max-w-lg mx-auto mt-16 shadow-card backdrop-blur-md">
+            <div className="text-5xl mb-6 opacity-80">🥀</div>
+            <h3 className="font-fantasy font-bold text-2xl mb-3 text-red-400">The Spell Failed</h3>
+            <p className="mb-6 font-sans text-lg">{errorMsg}</p>
             <button 
               onClick={() => window.location.reload()}
-              className="px-6 py-2 bg-red-900 hover:bg-red-800 border border-red-700 rounded transition-all shadow-lg text-sm font-semibold tracking-wider uppercase"
+              className="px-8 py-3 bg-red-900/40 hover:bg-red-900/60 border border-red-700/50 rounded-full transition-all shadow-lg text-sm font-fantasy tracking-widest uppercase text-red-100 hover:shadow-red-900/20"
             >
-              Try Again
+              Rekindle
             </button>
           </div>
         )}
 
         {status === LoadingState.SUCCESS && (
-          <div className="space-y-2 animate-fade-in">
+          <div className="space-y-8 animate-fade-in pb-12">
             
-            <div className="flex justify-center">
+            <div className="flex justify-center w-full">
                <RuleSelector 
                  rules={rules}
                  selectedId={selectedRuleId}
@@ -100,7 +119,7 @@ const App: React.FC = () => {
             </div>
 
             {selectedRule ? (
-              <div className="animate-slide-up">
+              <div className="animate-slide-up transition-all duration-500 ease-out">
                 <RuleDisplay 
                   rule={selectedRule}
                   cachedExplanation={explanationCache[selectedRule.id]}
@@ -108,10 +127,14 @@ const App: React.FC = () => {
                 />
               </div>
             ) : (
-              <div className="text-center py-24 opacity-40 select-none">
-                <div className="text-7xl mb-6 text-gray-700">📜</div>
-                <p className="text-2xl font-fantasy text-gray-500">Select a keyword to begin</p>
-                <p className="text-sm font-mono text-gray-600 mt-2">Example: "Trample", "Storm", "Ward"</p>
+              <div className="flex flex-col items-center justify-center py-32 opacity-50 select-none text-center">
+                <div className="w-24 h-24 rounded-full border-2 border-dashed border-mtg-border flex items-center justify-center mb-6">
+                   <span className="text-5xl filter grayscale opacity-50">🌿</span>
+                </div>
+                <p className="text-3xl font-fantasy text-mtg-leaf/80 mb-2">The Grimoire is Closed</p>
+                <p className="text-lg font-sans text-gray-500 italic max-w-md">
+                  "Knowledge grows like a wild vine. Select a seed from the list above to verify its nature."
+                </p>
               </div>
             )}
           </div>
@@ -119,8 +142,10 @@ const App: React.FC = () => {
 
       </main>
 
-      <footer className="fixed bottom-0 w-full bg-mtg-dark/90 backdrop-blur-md text-center py-2 text-[10px] text-gray-600 border-t border-mtg-border z-10">
-        <p>Unofficial Fan Content. Not approved/endorsed by Wizards of the Coast.</p>
+      <footer className="fixed bottom-0 w-full bg-[#0f1216]/95 backdrop-blur-md text-center py-3 border-t border-mtg-border/40 z-20">
+        <p className="text-[10px] text-gray-500 font-sans tracking-wide">
+          <span className="text-mtg-leaf">✿</span> Fan Content. Not approved by Wizards of the Coast. <span className="text-mtg-leaf">✿</span>
+        </p>
       </footer>
     </div>
   );
