@@ -5,37 +5,54 @@ import { explainRule } from '../services/geminiService';
 
 interface Props {
   rule: RuleItem;
+  cachedExplanation?: string;
+  onCache: (explanation: string) => void;
 }
 
-const RuleDisplay: React.FC<Props> = ({ rule }) => {
+const RuleDisplay: React.FC<Props> = ({ rule, cachedExplanation, onCache }) => {
   const [explanation, setExplanation] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setExplanation(null);
+    // If we have a cached version, use it immediately
+    if (cachedExplanation) {
+      setExplanation(cachedExplanation);
+    } else {
+      setExplanation(null);
+    }
     setLoading(false);
-  }, [rule.id]);
+  }, [rule.id, cachedExplanation]);
 
   const handleExplain = async () => {
+    // Double check to prevent accidental double clicks
+    if (loading || explanation) return;
+
     setLoading(true);
     const fullTextBlob = rule.fullText.join('\n');
     const result = await explainRule(rule.name, fullTextBlob);
+    
+    // Only update and cache if it wasn't a fatal error (optional check, 
+    // but here we just cache whatever comes back so the user sees the error)
     setExplanation(result);
+    
+    // Cache the result so we don't pay for it again
+    onCache(result);
+    
     setLoading(false);
   };
 
   return (
     <div className="w-full max-w-4xl mx-auto bg-mtg-surface rounded-lg shadow-xl overflow-hidden border border-gray-700">
       
-      {/* Rule Header - Restored padding and text sizes */}
+      {/* Rule Header */}
       <div className="p-6 border-b border-gray-700 bg-[#2b2727]">
         <div className="mb-3">
           <h2 className="text-2xl sm:text-3xl font-bold text-mtg-accent leading-tight">{rule.name}</h2>
           <span className="text-sm text-gray-500 font-mono block mt-1">Rule {rule.id}</span>
         </div>
         
-        {/* Raw Rule Text */}
-        <div className="space-y-2 overflow-y-auto custom-scrollbar pr-2">
+        {/* Raw Rule Text - Full height, no scrollbar */}
+        <div className="space-y-2">
           {rule.fullText.length > 0 ? (
             rule.fullText.map((paragraph, index) => (
               <p key={index} className="text-gray-400 text-sm border-l-2 border-gray-600 pl-3">
@@ -78,7 +95,7 @@ const RuleDisplay: React.FC<Props> = ({ rule }) => {
 
         {explanation && (
           <div className="p-6 animate-fade-in pb-8">
-             {/* Restored Styling */}
+             {/* Styled Markdown Output */}
             <div className="prose prose-invert max-w-none text-gray-300 text-base leading-relaxed">
               <ReactMarkdown
                 components={{
@@ -101,7 +118,7 @@ const RuleDisplay: React.FC<Props> = ({ rule }) => {
                 onClick={handleExplain} 
                 className="text-xs text-gray-600 hover:text-indigo-400 transition-colors uppercase tracking-widest font-bold"
               >
-                Odśwież
+                Odśwież (Pobierz ponownie)
               </button>
             </div>
           </div>
