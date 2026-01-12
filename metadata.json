@@ -1,0 +1,5 @@
+{
+  "name": "MTG Rules Companion",
+  "description": "A specialized viewer for Magic: The Gathering Comprehensive Rules (sections 701 & 702), featuring AI-powered explanations.",
+  "requestFramePermissions": []
+}
