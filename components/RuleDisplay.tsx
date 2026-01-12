@@ -73,7 +73,7 @@ const RuleDisplay: React.FC<Props> = ({ rule, cachedExplanation, onCache }) => {
         
         {/* Official Rules Text (Oracle Text style) */}
         <div className="p-6 bg-[#1f1d1d]">
-          <div className="text-sm text-gray-300 leading-relaxed font-sans border-l-2 border-gray-700 pl-4 italic opacity-90">
+          <div className="text-sm text-gray-300 leading-relaxed font-sans opacity-95">
              {rule.fullText.length > 0 ? (
                 rule.fullText.map((paragraph, index) => (
                   <p key={index} className="mb-2 last:mb-0">

@@ -52,7 +52,7 @@ const App: React.FC = () => {
               <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" />
             </svg>
             <h1 className="text-xl md:text-2xl font-fantasy font-bold tracking-wider text-white bg-clip-text">
-              MTG Rules <span className="text-mtg-accent">Companion</span>
+              MTG <span className="text-mtg-accent">Rules Companion</span>
             </h1>
           </div>
           <div className="text-[10px] sm:text-xs text-gray-500 font-mono hidden sm:block uppercase tracking-widest">
@@ -64,7 +64,7 @@ const App: React.FC = () => {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         
         {status === LoadingState.LOADING && (
           <div className="flex flex-col items-center pt-20">
@@ -88,7 +88,7 @@ const App: React.FC = () => {
         )}
 
         {status === LoadingState.SUCCESS && (
-          <div className="space-y-8 animate-fade-in">
+          <div className="space-y-4 animate-fade-in">
             
             <div className="flex justify-center">
                <RuleSelector 

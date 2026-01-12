@@ -12,7 +12,7 @@ const RuleSelector: React.FC<Props> = ({ rules, selectedId, onSelect, disabled }
   const sortedRules = [...rules].sort((a, b) => a.name.localeCompare(b.name));
 
   return (
-    <div className="w-full max-w-lg mx-auto mb-8 relative z-10">
+    <div className="w-full max-w-lg mx-auto relative z-10">
       <label htmlFor="rule-select" className="block text-xs font-fantasy tracking-widest text-mtg-accent mb-2 uppercase ml-1">
         Search Grimoire
       </label>
