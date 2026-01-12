@@ -1,6 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 
 const getClient = () => {
+  // Accessing the API key directly from process.env as per guidelines
   const apiKey = process.env.API_KEY;
   if (!apiKey) {
     throw new Error("API Key not found");
@@ -13,15 +14,20 @@ export const explainRule = async (ruleName: string, ruleText: string): Promise<s
     const ai = getClient();
     
     const prompt = `
-      Jesteś sędzią Magic: The Gathering. Wyjaśnij graczowi działanie mechaniki "${ruleName}" w prosty sposób, po polsku.
-      
-      Oto oficjalny tekst zasad:
+      Jesteś sędzią Magic: The Gathering.
+      Wyjaśnij mechanikę "${ruleName}" w oparciu o tekst:
       ${ruleText}
 
-      Zasady:
-      1. Wyjaśnij krótko i zwięźle.
-      2. Podaj prosty przykład użycia, jeśli to możliwe.
-      3. Używaj polskiej terminologii MTG, ale w nawiasie podaj angielską, jeśli jest kluczowa.
+      INSTRUKCJE STYLU (BEZWZGLĘDNE):
+      1. NIE UŻYWAJ żadnych powitań ("Witaj", "Cześć").
+      2. NIE PRZEDSTAWIAJ SIĘ ("Jako sędzia...", "Oto wyjaśnienie...").
+      3. Zacznij od razu od konkretnego wyjaśnienia. Bądź zwięzły.
+
+      STRUKTURA ODPOWIEDZI:
+      1. Wyjaśnienie "po ludzku" jak to działa (krótko i na temat).
+      2. Prosty przykład sytuacji z gry.
+      
+      Odpowiadaj po polsku, zachowując angielskie terminy gry.
     `;
 
     const response = await ai.models.generateContent({
@@ -30,6 +36,7 @@ export const explainRule = async (ruleName: string, ruleText: string): Promise<s
     });
 
     return response.text || "Nie udało się wygenerować wyjaśnienia.";
+
   } catch (error) {
     console.error("Gemini API Error:", error);
     return "Wystąpił błąd podczas łączenia z AI Judge. Sprawdź klucz API.";
