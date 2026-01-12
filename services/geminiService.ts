@@ -26,7 +26,7 @@ export const explainRule = async (ruleName: string, ruleText: string): Promise<s
       4. Wyświetlane odpowiedzi bedą w oknie w telefonie, więc bądź w odpowiedziach wizualny.
       5. Używaj kolorów i odpowiedniego formatowania, aby odpowiedź nie była ścianą tekstu.
       6. Bądź czytelny w odpowiedzi. Używaj przerw pomiędzy strukturami w odpowiedzi.
-      7. Jeśli to pomoże, używaj kolorów i emotek.
+      7. Jeśli to pomoże, używaj kolorów.
 
       STRUKTURA ODPOWIEDZI:
       1. Pierwsze zdanie ma jak najkrocej podsumowac zdolnosc.
@@ -34,8 +34,9 @@ export const explainRule = async (ruleName: string, ruleText: string): Promise<s
       3. Prosty przykład sytuacji z gry.
     `;
 
+    // Changed from 'gemini-3-flash-preview' (20 RPD limit) to 'gemini-2.0-flash-exp' (1500 RPD limit)
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-2.0-flash-exp',
       contents: prompt,
     });
 
