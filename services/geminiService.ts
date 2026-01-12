@@ -26,6 +26,8 @@ export const explainRule = async (ruleName: string, ruleText: string): Promise<s
       STRUKTURA ODPOWIEDZI:
       1. Wyjaśnienie "po ludzku" jak to działa (krótko i na temat).
       2. Prosty przykład sytuacji z gry.
+      3. Wyświetlane odpowiedzi bedą w oknie w telefonie, więc bądź w odpowiedziach wizualny.
+      4. Używaj kolorów i odpowiedniego formatowania, aby odpowiedź nie była ścianą tekstu.
       
       Odpowiadaj po polsku, zachowując angielskie terminy gry.
     `;
