@@ -3,7 +3,8 @@ import { GoogleGenAI } from "@google/genai";
 const getClient = () => {
   const apiKey = process.env.API_KEY;
   if (!apiKey) {
-    throw new Error("API Key not found");
+    // This error will be caught in explainRule
+    throw new Error("Missing API_KEY. Check your .env file or GitHub Secrets.");
   }
   return new GoogleGenAI({ apiKey });
 };
@@ -38,10 +39,34 @@ export const explainRule = async (ruleName: string, ruleText: string): Promise<s
       contents: prompt,
     });
 
-    return response.text || "Nie udało się wygenerować wyjaśnienia.";
+    return response.text || "Nie udało się wygenerować wyjaśnienia (pusta odpowiedź).";
 
-  } catch (error) {
-    console.error("Gemini API Error:", error);
-    return "### Błąd połączenia\n> Wystąpił problem z API (sprawdź klucz lub połączenie).";
+  } catch (error: any) {
+    console.error("Gemini API Error Full:", error);
+    
+    let errorMessage = "Wystąpił nieznany błąd.";
+    let errorType = "Błąd";
+
+    // Extract message from various error structures
+    const rawMsg = error instanceof Error ? error.message : String(error);
+
+    if (rawMsg.includes("429") || rawMsg.includes("Too Many Requests") || rawMsg.includes("quota")) {
+      errorType = "Limit zapytań (429)";
+      errorMessage = "Osiągnięto limit darmowych zapytań do API. Odczekaj chwilę i spróbuj ponownie.";
+    } else if (rawMsg.includes("401") || rawMsg.includes("key") || rawMsg.includes("unauthorized")) {
+      errorType = "Błąd autoryzacji (401)";
+      errorMessage = "Klucz API jest nieprawidłowy lub go brakuje. Sprawdź konfigurację GitHub Secrets lub plik .env.";
+    } else if (rawMsg.includes("503") || rawMsg.includes("overloaded")) {
+      errorType = "Przeciążenie serwera";
+      errorMessage = "Serwery Google AI są obecnie przeciążone. Spróbuj ponownie później.";
+    } else if (rawMsg.includes("fetch failed") || rawMsg.includes("network")) {
+      errorType = "Błąd sieci";
+      errorMessage = "Nie udało się połączyć z API. Sprawdź swoje połączenie internetowe.";
+    } else {
+      errorMessage = `Szczegóły techniczne: ${rawMsg.slice(0, 100)}...`;
+    }
+
+    // Return specific markdown formatted error
+    return `### ${errorType}\n> ${errorMessage}`;
   }
 };
