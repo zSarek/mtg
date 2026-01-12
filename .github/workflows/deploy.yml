@@ -31,6 +31,9 @@ jobs:
         
       - name: Build
         run: npm run build
+        env:
+          # This pulls the secret from GitHub Settings and passes it to the build command
+          API_KEY: ${{ secrets.API_KEY }}
         
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
