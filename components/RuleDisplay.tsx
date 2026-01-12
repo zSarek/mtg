@@ -35,7 +35,7 @@ const RuleDisplay: React.FC<Props> = ({ rule }) => {
         </div>
         
         {/* Raw Rule Text */}
-        <div className="space-y-2 max-h-40 overflow-y-auto custom-scrollbar pr-2">
+        <div className="space-y-2 overflow-y-auto custom-scrollbar pr-2">
           {rule.fullText.length > 0 ? (
             rule.fullText.map((paragraph, index) => (
               <p key={index} className="text-gray-400 text-sm border-l-2 border-gray-600 pl-3">
