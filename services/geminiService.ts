@@ -36,7 +36,7 @@ export const explainRule = async (ruleName: string, ruleText: string): Promise<s
 
     // Changed from 'gemini-3-flash-preview' (20 RPD limit) to 'gemini-2.0-flash-exp' (1500 RPD limit)
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash-exp',
+      model: 'gemini-3-pro-image',
       contents: prompt,
     });
 
