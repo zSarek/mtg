@@ -120,5 +120,6 @@ const parseRulesText = (text: string): RuleItem[] => {
     state.rules.push(state.currentRule);
   }
 
-  return state.rules;
+  // Filter out introductory rules 701.1 and 702.1
+  return state.rules.filter(r => r.id !== '701.1' && r.id !== '702.1');
 };
