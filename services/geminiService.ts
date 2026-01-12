@@ -22,14 +22,15 @@ export const explainRule = async (ruleName: string, ruleText: string): Promise<s
       1. NIE UŻYWAJ żadnych powitań ("Witaj", "Cześć").
       2. NIE PRZEDSTAWIAJ SIĘ ("Jako sędzia...", "Oto wyjaśnienie...").
       3. Zacznij od razu od konkretnego wyjaśnienia. Bądź zwięzły.
+      4. Wyświetlane odpowiedzi bedą w oknie w telefonie, więc bądź w odpowiedziach wizualny.
+      5. Używaj kolorów i odpowiedniego formatowania, aby odpowiedź nie była ścianą tekstu.
+      6. Bądź czytelny w odpowiedzi. Używaj przerw pomiędzy strukturami w odpowiedzi.
+      7. Jeśli to pomoże, używaj kolorów.
 
       STRUKTURA ODPOWIEDZI:
-      1. Wyjaśnienie "po ludzku" jak to działa (krótko i na temat).
-      2. Prosty przykład sytuacji z gry.
-      3. Wyświetlane odpowiedzi bedą w oknie w telefonie, więc bądź w odpowiedziach wizualny.
-      4. Używaj kolorów i odpowiedniego formatowania, aby odpowiedź nie była ścianą tekstu.
-      5. Bądź czytelny w odpowiedzi. Używaj przerw w tekscie pomiędzy sekcjami.
-      6. Jeśli to pomoże, używaj kolorów.
+      1. Pierwsze zdanie ma jak najkrocej podsumowac zdolnosc.
+      2. Wyjaśnienie "po ludzku" jak to działa (krótko i na temat).
+      3. Prosty przykład sytuacji z gry.
       
       Odpowiadaj po polsku, zachowując angielskie terminy gry.
     `;
