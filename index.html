@@ -4,20 +4,36 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MTG Rules Companion</title>
-    <!-- Tailwind via CDN for simplicity, though build tools usually import it via CSS -->
+    
+    <!-- Fonts: Cinzel for headers (Fantasy vibe), Inter for readability -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
         theme: {
           extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              fantasy: ['Cinzel', 'serif'],
+            },
             colors: {
               mtg: {
-                dark: '#1a1818',
-                accent: '#d4af37', // Gold-ish
+                dark: '#0f0e0e',       // Deeper black/brown
+                surface: '#1c1b1b',    // Card surface color
+                accent: '#d4af37',     // Gold / Mythic Rare
+                accentHover: '#fceba4',
                 blue: '#0073e6',
-                text: '#e0e0e0',
-                surface: '#2b2727'
+                text: '#e2e2e2',
+                border: '#3d3a3a'
               }
+            },
+            boxShadow: {
+              'mythic': '0 0 15px rgba(212, 175, 55, 0.3)',
+              'card': '0 10px 30px -5px rgba(0, 0, 0, 0.5)',
             }
           }
         }
@@ -25,25 +41,27 @@
     </script>
     <style>
       body {
-        background-color: #1a1818;
-        color: #e0e0e0;
+        background-color: #0f0e0e;
+        color: #e2e2e2;
+        /* Subtle texture pattern */
+        background-image: radial-gradient(circle at 50% 0%, #2a2626 0%, #0f0e0e 70%);
+        min-height: 100vh;
       }
       ::-webkit-scrollbar {
-        width: 8px;
+        width: 10px;
       }
       ::-webkit-scrollbar-track {
-        background: #2b2727; 
+        background: #1c1b1b; 
       }
       ::-webkit-scrollbar-thumb {
-        background: #555; 
-        border-radius: 4px;
+        background: #444; 
+        border-radius: 5px;
+        border: 2px solid #1c1b1b;
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: #777; 
+        background: #d4af37; 
       }
     </style>
-    <!-- Importmap is kept for local dev environment compatibility, 
-         but Vite will ignore/replace this during build -->
     <script type="importmap">
 {
   "imports": {
@@ -61,8 +79,6 @@
 </head>
   <body>
     <div id="root"></div>
-    <!-- CRITICAL FIX: Changed from "/index.tsx" to "./index.tsx" 
-         This allows the app to load correctly when hosted in a subdirectory like /repo-name/ -->
     <script type="module" src="./index.tsx"></script>
   <script type="module" src="/index.tsx"></script>
 </body>

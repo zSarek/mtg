@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { RuleItem } from '../types';
 import { explainRule } from '../services/geminiService';
+import LoadingSpinner from './LoadingSpinner';
 
 interface Props {
   rule: RuleItem;
@@ -14,7 +15,6 @@ const RuleDisplay: React.FC<Props> = ({ rule, cachedExplanation, onCache }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // If we have a cached version, use it immediately
     if (cachedExplanation) {
       setExplanation(cachedExplanation);
     } else {
@@ -23,106 +23,129 @@ const RuleDisplay: React.FC<Props> = ({ rule, cachedExplanation, onCache }) => {
     setLoading(false);
   }, [rule.id, cachedExplanation]);
 
-  const handleExplain = async () => {
-    // Double check to prevent accidental double clicks
-    if (loading || explanation) return;
-
+  const fetchExplanation = async () => {
     setLoading(true);
     const fullTextBlob = rule.fullText.join('\n');
     const result = await explainRule(rule.name, fullTextBlob);
     
-    // Only update and cache if it wasn't a fatal error (optional check, 
-    // but here we just cache whatever comes back so the user sees the error)
     setExplanation(result);
-    
-    // Cache the result so we don't pay for it again
     onCache(result);
-    
     setLoading(false);
   };
 
+  const handleExplain = async () => {
+    if (loading || explanation) return;
+    await fetchExplanation();
+  };
+
+  const handleRegenerate = async () => {
+    if (loading) return;
+    await fetchExplanation();
+  };
+
   return (
-    <div className="w-full max-w-4xl mx-auto bg-mtg-surface rounded-lg shadow-xl overflow-hidden border border-gray-700">
+    <div className="w-full max-w-4xl mx-auto relative group">
       
-      {/* Rule Header */}
-      <div className="p-6 border-b border-gray-700 bg-[#2b2727]">
-        <div className="mb-3">
-          <h2 className="text-2xl sm:text-3xl font-bold text-mtg-accent leading-tight">{rule.name}</h2>
-          <span className="text-sm text-gray-500 font-mono block mt-1">Rule {rule.id}</span>
+      {/* Decorative Glow behind the card */}
+      <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-mtg-accent rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
+
+      {/* Card Container */}
+      <div className="relative bg-mtg-surface rounded-xl shadow-card border border-mtg-border overflow-hidden">
+        
+        {/* Card Title Bar */}
+        <div className="relative bg-[#151414] border-b border-[#3d3a3a] px-6 py-4 flex justify-between items-center shadow-md">
+          <div className="absolute top-0 left-0 w-1 h-full bg-mtg-accent"></div>
+          <div>
+             <h2 className="text-2xl md:text-3xl font-fantasy font-bold text-white tracking-wide drop-shadow-md">
+              {rule.name}
+            </h2>
+            <div className="text-xs text-gray-500 font-mono mt-1 flex items-center gap-2">
+               <span className="bg-[#2a2626] px-2 py-0.5 rounded text-gray-400">CR {rule.id}</span>
+               <span className="text-mtg-accent opacity-60">Keywords</span>
+            </div>
+          </div>
+          {/* Mana Cost / Symbol Placeholder */}
+          <div className="hidden sm:flex space-x-1 opacity-70">
+            <div className="w-4 h-4 rounded-full bg-gray-600/50"></div>
+            <div className="w-4 h-4 rounded-full bg-gray-600/50"></div>
+          </div>
         </div>
         
-        {/* Raw Rule Text - Full height, no scrollbar */}
-        <div className="space-y-2">
-          {rule.fullText.length > 0 ? (
-            rule.fullText.map((paragraph, index) => (
-              <p key={index} className="text-gray-400 text-sm border-l-2 border-gray-600 pl-3">
-                {paragraph}
+        {/* Official Rules Text (Oracle Text style) */}
+        <div className="p-6 bg-[#1f1d1d]">
+          <div className="text-sm text-gray-300 leading-relaxed font-sans border-l-2 border-gray-700 pl-4 italic opacity-90">
+             {rule.fullText.length > 0 ? (
+                rule.fullText.map((paragraph, index) => (
+                  <p key={index} className="mb-2 last:mb-0">
+                    {paragraph}
+                  </p>
+                ))
+              ) : (
+                <span className="text-gray-600">No official text available.</span>
+              )}
+          </div>
+        </div>
+
+        {/* AI Action / Explanation Area */}
+        <div className="bg-[#151414] min-h-[180px] relative border-t border-mtg-border">
+          
+          {/* Texture Overlay */}
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/stardust.png")' }}></div>
+
+          {!explanation && !loading && (
+            <div className="flex flex-col items-center justify-center py-12 px-6">
+              <button
+                onClick={handleExplain}
+                className="group relative inline-flex items-center justify-center px-8 py-3 font-fantasy font-bold text-white transition-all duration-200 bg-indigo-900 font-lg rounded-lg hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 offset-gray-900 overflow-hidden"
+              >
+                <span className="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent to-black"></span>
+                <span className="relative flex items-center gap-2 tracking-widest uppercase text-sm">
+                   <span className="text-xl">✨</span> Explain Mechanic
+                </span>
+              </button>
+              <p className="text-gray-600 mt-4 text-xs text-center max-w-sm">
+                Spend 1 mana to summon a simplified explanation and examples from the AEther.
               </p>
-            ))
-          ) : (
-            <p className="text-gray-500 italic text-xs">Brak opisu.</p>
+            </div>
+          )}
+
+          {loading && (
+            <div className="flex flex-col items-center justify-center py-12 space-y-4">
+              <LoadingSpinner />
+              <p className="text-mtg-accent text-sm animate-pulse font-fantasy tracking-widest uppercase">Consulting the Oracle...</p>
+            </div>
+          )}
+
+          {explanation && (
+            <div className="p-6 animate-fade-in relative z-10">
+               {/* Markdown Output */}
+              <div className="prose prose-invert max-w-none prose-p:text-gray-300 prose-headings:font-fantasy prose-headings:text-mtg-accent prose-strong:text-indigo-300 prose-li:text-gray-300">
+                <ReactMarkdown
+                  components={{
+                    h3: ({node, ...props}) => <h3 className="text-xl mt-4 mb-3 border-b border-gray-800 pb-2" {...props} />,
+                    strong: ({node, ...props}) => <strong className="font-bold text-indigo-400" {...props} />,
+                    ul: ({node, ...props}) => <ul className="list-disc pl-5 space-y-2 my-4" {...props} />,
+                    blockquote: ({node, ...props}) => (
+                      <blockquote className="border-l-4 border-indigo-500/50 bg-[#1c1b1b] p-4 rounded italic text-gray-400 my-4" {...props} />
+                    ),
+                  }}
+                >
+                  {explanation}
+                </ReactMarkdown>
+              </div>
+              
+              <div className="mt-8 flex justify-end border-t border-gray-800 pt-4">
+                <button 
+                  onClick={handleRegenerate} 
+                  className="text-[10px] text-gray-500 hover:text-mtg-accent transition-colors uppercase tracking-widest font-bold flex items-center gap-1"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                  Mulligan (Regenerate)
+                </button>
+              </div>
+            </div>
           )}
         </div>
-      </div>
-
-      {/* AI Action Area */}
-      <div className="bg-[#1a1818] min-h-[200px] relative">
-        
-        {!explanation && !loading && (
-          <div className="flex flex-col items-center justify-center py-10 px-4">
-            <button
-              onClick={handleExplain}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-indigo-600 active:bg-indigo-700 text-white rounded-xl transition-all font-semibold text-lg shadow-lg shadow-indigo-900/30 touch-manipulation"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
-              </svg>
-              Wyjaśnij (AI)
-            </button>
-            <p className="text-gray-500 mt-3 text-sm text-center">Kliknij, aby uzyskać prosty opis i przykład.</p>
-          </div>
-        )}
-
-        {loading && (
-          <div className="flex flex-col items-center justify-center py-12 space-y-4">
-            <div className="relative">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
-              <div className="absolute top-0 left-0 w-full h-full rounded-full animate-ping opacity-20 bg-indigo-500"></div>
-            </div>
-            <p className="text-indigo-400 text-sm animate-pulse font-medium">Analizuję...</p>
-          </div>
-        )}
-
-        {explanation && (
-          <div className="p-6 animate-fade-in pb-8">
-             {/* Styled Markdown Output */}
-            <div className="prose prose-invert max-w-none text-gray-300 text-base leading-relaxed">
-              <ReactMarkdown
-                components={{
-                  h3: ({node, ...props}) => <h3 className="text-mtg-accent font-bold text-lg mt-6 mb-3 border-b border-gray-700 pb-1" {...props} />,
-                  strong: ({node, ...props}) => <strong className="text-indigo-400 font-extrabold" {...props} />,
-                  ul: ({node, ...props}) => <ul className="list-disc pl-5 space-y-2 mb-4 text-gray-300" {...props} />,
-                  li: ({node, ...props}) => <li className="pl-1" {...props} />,
-                  p: ({node, ...props}) => <p className="mb-4 text-gray-200" {...props} />,
-                  blockquote: ({node, ...props}) => (
-                    <blockquote className="border-l-4 border-mtg-blue bg-[#222020] p-4 rounded-r-lg my-6 italic text-gray-300 shadow-md" {...props} />
-                  ),
-                }}
-              >
-                {explanation}
-              </ReactMarkdown>
-            </div>
-            
-            <div className="mt-8 flex justify-center border-t border-gray-800 pt-4">
-              <button 
-                onClick={handleExplain} 
-                className="text-xs text-gray-600 hover:text-indigo-400 transition-colors uppercase tracking-widest font-bold"
-              >
-                Odśwież (Pobierz ponownie)
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -1,8 +1,13 @@
 import React from 'react';
 
 const LoadingSpinner: React.FC = () => (
-  <div className="flex justify-center items-center py-10">
-    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-mtg-accent"></div>
+  <div className="relative flex justify-center items-center">
+    {/* Outer ring */}
+    <div className="absolute animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
+    {/* Inner ring */}
+    <div className="absolute animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-mtg-accent animation-delay-150" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
+    {/* Core */}
+    <div className="h-4 w-4 bg-white rounded-full animate-pulse shadow-[0_0_15px_rgba(255,255,255,0.8)]"></div>
   </div>
 );
 

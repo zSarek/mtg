@@ -3,7 +3,6 @@ import { GoogleGenAI } from "@google/genai";
 const getClient = () => {
   const apiKey = process.env.API_KEY;
   if (!apiKey) {
-    // This error will be caught in explainRule
     throw new Error("Missing API_KEY. Check your .env file or GitHub Secrets.");
   }
   return new GoogleGenAI({ apiKey });
@@ -26,7 +25,7 @@ export const explainRule = async (ruleName: string, ruleText: string): Promise<s
       4. Wyświetlane odpowiedzi bedą w oknie w telefonie, więc bądź w odpowiedziach wizualny.
       5. Używaj kolorów i odpowiedniego formatowania, aby odpowiedź nie była ścianą tekstu.
       6. Bądź czytelny w odpowiedzi. Używaj przerw pomiędzy strukturami w odpowiedzi.
-      7. Jeśli to pomoże, używaj kolorów i emoji.
+      7. Jeśli to pomoże, używaj kolorów.
 
       STRUKTURA ODPOWIEDZI:
       1. Pierwsze zdanie ma jak najkrocej podsumowac zdolnosc.
@@ -34,9 +33,17 @@ export const explainRule = async (ruleName: string, ruleText: string): Promise<s
       3. Prosty przykład sytuacji z gry.
     `;
 
-    // Changed from 'gemini-3-flash-preview' (20 RPD limit) to 'gemini-2.0-flash-exp' (1500 RPD limit)
+    // ---------------------------------------------------------
+    // KONFIGURACJA MODELU (MODEL CONFIGURATION)
+    // ---------------------------------------------------------
+    // Dostępne modele:
+    // 1. 'gemini-3-flash-preview'  <- Najnowszy, bardzo szybki (uwaga na limity!)
+    // 2. 'gemini-2.0-flash-exp'    <- Wysokie limity, stabilny
+    // 3. 'gemini-3-pro-preview'    <- Najinteligentniejszy, do trudnych zadań
+    // ---------------------------------------------------------
+    
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-3-flash-preview', // <--- TU ZMIENIASZ MODEL
       contents: prompt,
     });
 
@@ -48,12 +55,11 @@ export const explainRule = async (ruleName: string, ruleText: string): Promise<s
     let errorMessage = "Wystąpił nieznany błąd.";
     let errorType = "Błąd";
 
-    // Extract message from various error structures
     const rawMsg = error instanceof Error ? error.message : String(error);
 
     if (rawMsg.includes("429") || rawMsg.includes("Too Many Requests") || rawMsg.includes("quota")) {
       errorType = "Limit zapytań (429)";
-      errorMessage = "Osiągnięto limit darmowych zapytań do API. Odczekaj chwilę i spróbuj ponownie.";
+      errorMessage = "Osiągnięto limit darmowych zapytań dla tego modelu (gemini-3-flash ma niskie limity). Spróbuj zmienić model na gemini-2.0-flash-exp w services/geminiService.ts";
     } else if (rawMsg.includes("401") || rawMsg.includes("key") || rawMsg.includes("unauthorized")) {
       errorType = "Błąd autoryzacji (401)";
       errorMessage = "Klucz API jest nieprawidłowy lub go brakuje. Sprawdź konfigurację GitHub Secrets lub plik .env.";
@@ -67,7 +73,6 @@ export const explainRule = async (ruleName: string, ruleText: string): Promise<s
       errorMessage = `Szczegóły techniczne: ${rawMsg.slice(0, 100)}...`;
     }
 
-    // Return specific markdown formatted error
     return `### ${errorType}\n> ${errorMessage}`;
   }
 };
