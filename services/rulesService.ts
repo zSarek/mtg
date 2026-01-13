@@ -10,25 +10,25 @@ const MANUAL_RULES: RuleItem[] = [
     id: '702.VIVID', 
     category: '702', 
     name: 'Vivid', 
-    fullText: ['(Mechanic) "Vivid" is a land subtype. Vivid lands enter the battlefield tapped with two charge counters on them. They can produce any color of mana by removing a charge counter.'] 
+    fullText: ['Vivid is an ability word that highlights abilities that care in some way about the number of colors among permanents you control. This number will be between zero and five.'] 
   },
   { 
     id: '702.BLIGHT', 
     category: '702', 
     name: 'Blight', 
-    fullText: ['(New Mechanic) Please consult the Oracle Interpretation for the latest details on this mechanic if it is not yet in the official Comprehensive Rules.'] 
+    fullText: ['To blight N, put N -1/-1 counters on a creature you control. That creature is not targeted, so you choose which creature will get the -1/-1 counters as you are taking the blight action. Importantly, you can put more -1/-1 counters on a creature than it would take to get rid of it.'] 
   },
   { 
     id: '702.KINDRED', 
     category: '702', 
     name: 'Kindred', 
-    fullText: ['(Card Type) "Kindred" is a card type (formerly known as "Tribal"). It allows non-creature cards to have creature types.'] 
+    fullText: ['"Kindred" is a card type (formerly known as "Tribal"). It allows non-creature cards to have creature types.'] 
   },
   { 
     id: '712.DFC', 
     category: '702', 
     name: 'Double-Faced Cards', 
-    fullText: ['(Section 712) Double-faced cards have a Magic card face on each side. They have no Magic card back. They can be Transforming Double-Faced Cards (TDFC) or Modal Double-Faced Cards (MDFC).'] 
+    fullText: ['Double-faced cards have a Magic card face on each side. They have no Magic card back. They can be Transforming Double-Faced Cards (TDFC) or Modal Double-Faced Cards (MDFC).'] 
   }
 ];
 
