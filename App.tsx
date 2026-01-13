@@ -63,9 +63,9 @@ const App: React.FC = () => {
             
             <div className="flex flex-col">
               <h1 className="text-2xl font-fantasy font-bold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-mtg-accent via-[#f5e3a8] to-mtg-accent drop-shadow-sm">
-                LORWYN
+                MTG
               </h1>
-              <span className="text-[10px] tracking-[0.3em] uppercase text-mtg-eclipse font-bold -mt-1 ml-0.5">Rules Codex</span>
+              <span className="text-[10px] tracking-[0.3em] uppercase text-mtg-eclipse font-bold -mt-1 ml-0.5">Rules Companion</span>
             </div>
           </div>
           

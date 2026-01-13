@@ -92,13 +92,13 @@ const RuleDisplay: React.FC<Props> = ({ rule, cachedExplanation, onCache }) => {
                   </p>
                 ))
               ) : (
-                <span className="text-gray-500 italic">No official text available via API.</span>
+                <span className="text-gray-500 italic">No official text available via API. The AI interpretation will use its knowledge base.</span>
               )}
           </div>
         </div>
 
         {/* AI Interpretation Section (The "Spell") */}
-        <div className="bg-[#121518] relative border-t border-mtg-border/50 min-h-[160px]">
+        <div className="bg-[#121518] relative border-t border-mtg-border/50 min-h-[120px]">
           
           {/* Magical Texture Overlay */}
           <div className="absolute inset-0 opacity-[0.05]" 
@@ -106,10 +106,10 @@ const RuleDisplay: React.FC<Props> = ({ rule, cachedExplanation, onCache }) => {
           </div>
 
           {!explanation && !loading && (
-            <div className="relative z-10 flex flex-col items-center justify-center py-10">
+            <div className="relative z-10 flex flex-col items-center justify-center py-8">
               <button
                 onClick={handleExplain}
-                className="group relative overflow-hidden rounded-full px-10 py-3 transition-transform active:scale-95 hover:shadow-glow-purple"
+                className="group relative overflow-hidden rounded-full px-6 py-2 transition-transform active:scale-95 hover:shadow-glow-purple"
               >
                 {/* Button Background Gradient */}
                 <div className="absolute inset-0 bg-gradient-to-r from-mtg-eclipse via-indigo-900 to-mtg-leaf opacity-80 group-hover:opacity-100 transition-opacity"></div>
@@ -117,22 +117,19 @@ const RuleDisplay: React.FC<Props> = ({ rule, cachedExplanation, onCache }) => {
                 {/* Button Border */}
                 <div className="absolute inset-0 rounded-full border border-mtg-accent/50 group-hover:border-mtg-accent"></div>
                 
-                <span className="relative flex items-center gap-3 font-fantasy font-bold tracking-widest text-mtg-text text-lg uppercase">
+                <span className="relative flex items-center gap-2 font-fantasy font-bold tracking-widest text-mtg-text text-sm uppercase">
                    <span>🔮</span>
                    <span>Invoke Interpretation</span>
                    <span>🔮</span>
                 </span>
               </button>
-              <p className="mt-4 text-sm font-sans italic text-gray-500 text-center">
-                Uses AI to simplify legalese into plain Lorwyn dialect.
-              </p>
             </div>
           )}
 
           {loading && (
-            <div className="flex flex-col items-center justify-center py-10 gap-4">
-              <LoadingSpinner />
-              <p className="text-mtg-eclipse text-sm font-fantasy tracking-[0.2em] animate-pulse">
+            <div className="flex flex-col items-center justify-center py-8 gap-3">
+              <div className="scale-75"><LoadingSpinner /></div>
+              <p className="text-mtg-eclipse text-xs font-fantasy tracking-[0.2em] animate-pulse">
                 Weaving magic...
               </p>
             </div>
