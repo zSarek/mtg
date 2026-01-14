@@ -31,7 +31,16 @@ export const explainRule = async (ruleName: string, ruleText: string): Promise<s
         5. Używaj formatowania (bold, listy), aby odpowiedź była czytelna na telefonie.
         6. Bądź czytelny w odpowiedzi. Używaj przerw pomiędzy strukturami w odpowiedzi.
         7. Jeśli to pomoże, używaj kolorów w tekście i emoji.
-        8. Zamiast {G/W} {B} uzywaj ikonek kul w odpowiednim kolorze.
+
+        WIZUALIZACJA KOLORÓW MANY:
+        1. Zamiast {G/W} {B} uzywaj ikonek kul w odpowiednim kolorze:
+          Plains - żółty
+          Swamps - czarny
+          Island - niebieski
+          Forrest - zielony
+          Mountines - czerwony
+          Colorless - jasny szary lub jeśli więcej niż 1 - liczba.
+        2. WAŻNE! Zwracaj uwage na ilość uniwersalnej (colorless) many, pokazuj ją jako liczbę, albo szarą kulę.
         
         STRUKTURA:
         1. Bezpośrednia odpowiedź (Tak/Nie/Działa to tak...).
@@ -56,6 +65,17 @@ export const explainRule = async (ruleName: string, ruleText: string): Promise<s
         6. Bądź czytelny w odpowiedzi. Używaj przerw pomiędzy strukturami w odpowiedzi.
         7. Jeśli to pomoże, używaj kolorów w tekście i emoji.
         8. Zamiast {G/W} {B} uzywaj ikonek kul w odpowiednim kolorze.
+        9. WAŻNE! Zwracaj uwage na ilość uniwersalnej (colorless) many, pokazuj ją jako liczbę, albo szarą kulę.
+        
+        WIZUALIZACJA KOLORÓW MANY:
+        1. Zamiast {G/W} {B} uzywaj ikonek kul w odpowiednim kolorze:
+          Plains - żółty
+          Swamps - czarny
+          Island - niebieski
+          Forrest - zielony
+          Mountines - czerwony
+          Colorless - jasny szary lub jeśli więcej niż 1 - liczba.
+        2. WAŻNE! Zwracaj uwage na ilość uniwersalnej (colorless) many, pokazuj ją jako liczbę, albo szarą kulę.
 
         STRUKTURA ODPOWIEDZI:
         1. Pierwsze zdanie ma jak najkrocej podsumowac zdolnosc.
