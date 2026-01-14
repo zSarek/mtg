@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MTG Rules Companion - Lorwyn Eclipse</title>
     
-    <!-- Fonts: Cinzel for headers, Cormorant Garamond for that storybook/MTG flavor text feel -->
+    <!-- Fonts: Cinzel for headers (Fantasy feel), Inter for body (Maximum readability) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <!-- Tailwind via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -17,7 +17,7 @@
         theme: {
           extend: {
             fontFamily: {
-              sans: ['"Cormorant Garamond"', 'serif'], // Swapped Inter for Cormorant
+              sans: ['Inter', 'sans-serif'], // Changed from Cormorant Garamond to Inter for better readability
               fantasy: ['Cinzel', 'serif'],
             },
             colors: {
@@ -55,7 +55,7 @@
         /* Organic noise texture overlay */
         background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E"), linear-gradient(to bottom, #090b0f, #152225);
         min-height: 100vh;
-        font-size: 18px; /* Slightly larger base font for Garamond */
+        /* Removed font-size 18px override to rely on Inter's standard sizes for better scaling */
       }
       ::-webkit-scrollbar {
         width: 10px;
@@ -92,11 +92,9 @@
   }
 }
 </script>
-  <link rel="stylesheet" href="/index.css">
-</head>
+  </head>
   <body>
     <div id="root"></div>
     <script type="module" src="./index.tsx"></script>
-  <script type="module" src="/index.tsx"></script>
-</body>
+  </body>
 </html>
