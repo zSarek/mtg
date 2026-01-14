@@ -84,11 +84,11 @@ const RuleDisplay: React.FC<Props> = ({ rule, cachedExplanation, onCache }) => {
                style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '20px 20px' }}>
           </div>
           
-          {/* Book style: indent-6 for indentation, text-base for 16px font */}
+          {/* Book style: indent-6 for indentation, text-base for 16px font, text-justify added */}
           <div className="font-sans text-base text-[#d0d4c5] leading-relaxed space-y-2">
              {rule.fullText.length > 0 ? (
                 rule.fullText.map((paragraph, index) => (
-                  <p key={index} className="indent-6">
+                  <p key={index} className="indent-6 text-justify">
                     {paragraph}
                   </p>
                 ))
@@ -144,9 +144,9 @@ const RuleDisplay: React.FC<Props> = ({ rule, cachedExplanation, onCache }) => {
                  <div className="h-px bg-mtg-eclipse flex-grow opacity-50"></div>
                </div>
 
-              {/* Markdown Content - Text sized to text-base */}
+              {/* Markdown Content - Text sized to text-base, added prose-p:text-justify */}
               <div className="prose prose-invert max-w-none 
-                prose-p:text-[#e0e0d0] prose-p:font-sans prose-p:text-base prose-p:leading-7
+                prose-p:text-[#e0e0d0] prose-p:font-sans prose-p:text-base prose-p:leading-7 prose-p:text-justify
                 prose-headings:font-fantasy prose-headings:text-mtg-accent prose-headings:tracking-wide
                 prose-strong:text-indigo-300 prose-strong:font-bold
                 prose-li:text-gray-300 prose-li:marker:text-mtg-leaf">
