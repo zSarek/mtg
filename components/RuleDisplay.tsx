@@ -14,14 +14,24 @@ const RuleDisplay: React.FC<Props> = ({ rule, cachedExplanation, onCache }) => {
   const [explanation, setExplanation] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const isCustom = rule.id === 'custom';
+
   useEffect(() => {
     if (cachedExplanation) {
       setExplanation(cachedExplanation);
     } else {
       setExplanation(null);
+      // Auto-fetch for custom queries if not cached
+      if (isCustom) {
+        // slight delay to allow UI to render first
+        const timer = setTimeout(() => {
+            fetchExplanation();
+        }, 100);
+        return () => clearTimeout(timer);
+      }
     }
     setLoading(false);
-  }, [rule.id, cachedExplanation]);
+  }, [rule.id, rule.name, cachedExplanation]);
 
   const fetchExplanation = async () => {
     setLoading(true);
@@ -57,56 +67,60 @@ const RuleDisplay: React.FC<Props> = ({ rule, cachedExplanation, onCache }) => {
           {/* Top Border Gradient */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-mtg-leaf via-mtg-accent to-mtg-eclipse"></div>
           
-          <div className="z-10">
-             <h2 className="text-3xl sm:text-4xl font-fantasy font-bold text-mtg-text tracking-wider drop-shadow-md">
+          <div className="z-10 w-full">
+             <h2 className="text-3xl sm:text-4xl font-fantasy font-bold text-mtg-text tracking-wider drop-shadow-md break-words">
               {rule.name}
             </h2>
             <div className="flex items-center gap-3 mt-2">
-               <span className="font-fantasy text-xs tracking-widest text-mtg-accent border border-mtg-accent/30 px-2 py-1 rounded bg-[#1a1810]">
-                 CR {rule.id}
+               <span className={`font-fantasy text-xs tracking-widest text-mtg-accent border border-mtg-accent/30 px-2 py-1 rounded bg-[#1a1810] ${isCustom ? 'bg-mtg-eclipse/20 text-purple-300' : ''}`}>
+                 {isCustom ? 'QUERY' : `CR ${rule.id}`}
                </span>
                <div className="h-px w-8 bg-mtg-border"></div>
-               <span className="text-sm italic text-gray-400 font-sans">Comprehensive Rules</span>
+               <span className="text-sm italic text-gray-400 font-sans">
+                 {isCustom ? 'Judge Consultation' : 'Comprehensive Rules'}
+               </span>
             </div>
           </div>
           
           {/* Decorative Rune/Symbol */}
-          <div className="hidden sm:block opacity-20 text-mtg-accent">
+          <div className="hidden sm:block opacity-20 text-mtg-accent shrink-0 ml-4">
             <svg width="60" height="60" viewBox="0 0 100 100" fill="currentColor">
                <path d="M50 0 L60 40 L100 50 L60 60 L50 100 L40 60 L0 50 L40 40 Z" />
             </svg>
           </div>
         </div>
         
-        {/* Official Rules Body (Oracle Text) */}
-        <div className="p-8 bg-[#1a2324] relative">
-          <div className="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none" 
-               style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '20px 20px' }}>
+        {/* Official Rules Body (Oracle Text) - Only show if not custom or has text */}
+        {!isCustom && (
+          <div className="p-8 bg-[#1a2324] relative">
+            <div className="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none" 
+                 style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '20px 20px' }}>
+            </div>
+            
+            {/* Book style: removed indent-6, added italic, kept text-justify */}
+            <div className="font-sans text-base text-[#d0d4c5] leading-relaxed space-y-2">
+               {rule.fullText.length > 0 ? (
+                  rule.fullText.map((paragraph, index) => (
+                    <p key={index} className="italic text-justify">
+                      {paragraph}
+                    </p>
+                  ))
+                ) : (
+                  <span className="text-gray-500 italic">No official text available via API. The AI interpretation will use its knowledge base.</span>
+                )}
+            </div>
           </div>
-          
-          {/* Book style: removed indent-6, added italic, kept text-justify */}
-          <div className="font-sans text-base text-[#d0d4c5] leading-relaxed space-y-2">
-             {rule.fullText.length > 0 ? (
-                rule.fullText.map((paragraph, index) => (
-                  <p key={index} className="italic text-justify">
-                    {paragraph}
-                  </p>
-                ))
-              ) : (
-                <span className="text-gray-500 italic">No official text available via API. The AI interpretation will use its knowledge base.</span>
-              )}
-          </div>
-        </div>
+        )}
 
         {/* AI Interpretation Section (The "Spell") */}
-        <div className="bg-[#121518] relative border-t border-mtg-border/50 min-h-[120px]">
+        <div className={`bg-[#121518] relative border-mtg-border/50 min-h-[120px] ${!isCustom ? 'border-t' : ''}`}>
           
           {/* Magical Texture Overlay */}
           <div className="absolute inset-0 opacity-[0.05]" 
                style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}>
           </div>
 
-          {!explanation && !loading && (
+          {!explanation && !loading && !isCustom && (
             <div className="relative z-10 flex flex-col items-center justify-center py-8">
               <button
                 onClick={handleExplain}
@@ -131,7 +145,7 @@ const RuleDisplay: React.FC<Props> = ({ rule, cachedExplanation, onCache }) => {
             <div className="flex flex-col items-center justify-center py-8 gap-3">
               <div className="scale-75"><LoadingSpinner /></div>
               <p className="text-mtg-eclipse text-xs font-fantasy tracking-[0.2em] animate-pulse">
-                Weaving magic...
+                {isCustom ? 'Consulting the Oracle...' : 'Weaving magic...'}
               </p>
             </div>
           )}
@@ -140,7 +154,9 @@ const RuleDisplay: React.FC<Props> = ({ rule, cachedExplanation, onCache }) => {
             <div className="p-8 relative z-10 animate-fade-in">
                <div className="flex items-center gap-2 mb-6">
                  <div className="h-px bg-mtg-eclipse flex-grow opacity-50"></div>
-                 <h3 className="font-fantasy text-mtg-accent text-xl tracking-widest uppercase">Oracle's Insight</h3>
+                 <h3 className="font-fantasy text-mtg-accent text-xl tracking-widest uppercase">
+                   {isCustom ? "Judge's Ruling" : "Oracle's Insight"}
+                 </h3>
                  <div className="h-px bg-mtg-eclipse flex-grow opacity-50"></div>
                </div>
 

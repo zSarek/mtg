@@ -5,10 +5,11 @@ interface Props {
   rules: RuleItem[];
   selectedId: string;
   onSelect: (id: string) => void;
+  onCustomQuery: (query: string) => void;
   disabled: boolean;
 }
 
-const RuleSelector: React.FC<Props> = ({ rules, selectedId, onSelect, disabled }) => {
+const RuleSelector: React.FC<Props> = ({ rules, selectedId, onSelect, onCustomQuery, disabled }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -18,6 +19,8 @@ const RuleSelector: React.FC<Props> = ({ rules, selectedId, onSelect, disabled }
     const selected = rules.find(r => r.id === selectedId);
     if (selected) {
       setQuery(selected.name);
+    } else if (selectedId === 'custom') {
+      // Keep user's query if it's a custom state
     } else if (selectedId === '') {
       setQuery('');
     }
@@ -28,18 +31,11 @@ const RuleSelector: React.FC<Props> = ({ rules, selectedId, onSelect, disabled }
     const handleClickOutside = (event: MouseEvent) => {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
         setIsOpen(false);
-        // Revert query to selected item name if closed without selecting new one
-        const selected = rules.find(r => r.id === selectedId);
-        if (selected) {
-          setQuery(selected.name);
-        } else {
-          setQuery('');
-        }
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [rules, selectedId]);
+  }, []);
 
   // Filter rules based on query
   const filteredRules = query === ''
@@ -56,6 +52,25 @@ const RuleSelector: React.FC<Props> = ({ rules, selectedId, onSelect, disabled }
     onSelect(rule.id);
     setQuery(rule.name);
     setIsOpen(false);
+  };
+
+  const handleCustomSubmit = () => {
+    if (!query.trim()) return;
+    setIsOpen(false);
+    onCustomQuery(query);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      // If there is exactly one match that looks like what user typed, select it
+      // Otherwise, assume custom query
+      const exactMatch = filteredRules.find(r => r.name.toLowerCase() === query.toLowerCase());
+      if (exactMatch) {
+        handleSelect(exactMatch);
+      } else {
+        handleCustomSubmit();
+      }
+    }
   };
 
   const handleClear = (e: React.MouseEvent) => {
@@ -88,7 +103,8 @@ const RuleSelector: React.FC<Props> = ({ rules, selectedId, onSelect, disabled }
               if (e.target.value === '') onSelect('');
             }}
             onFocus={() => setIsOpen(true)}
-            placeholder="Search for a keyword..."
+            onKeyDown={handleKeyDown}
+            placeholder="Search keyword or ask a question..."
             className="block w-full rounded-lg border border-mtg-border bg-[#152225] py-4 pl-12 pr-12 text-mtg-accent shadow-2xl transition-all duration-300
                        focus:border-mtg-accent focus:ring-1 focus:ring-mtg-accent focus:outline-none 
                        placeholder-gray-600 font-sans text-xl tracking-wide"
@@ -124,34 +140,53 @@ const RuleSelector: React.FC<Props> = ({ rules, selectedId, onSelect, disabled }
         {/* Dropdown List */}
         {isOpen && !disabled && (
           <div className="absolute mt-2 w-full rounded-lg border border-mtg-border/60 bg-[#0f1216]/95 backdrop-blur-md shadow-card overflow-hidden z-50 animate-fade-in">
-             {filteredRules.length > 0 ? (
-               <ul className="max-h-60 overflow-y-auto py-1 scrollbar-thin scrollbar-thumb-mtg-border scrollbar-track-transparent">
-                 {filteredRules.map((rule) => {
-                   const isSelected = rule.id === selectedId;
-                   return (
-                     <li key={rule.id}>
-                       <button
-                         onClick={() => handleSelect(rule)}
-                         className={`w-full text-left px-6 py-3 transition-colors flex justify-between items-center group
-                           ${isSelected 
-                             ? 'bg-mtg-leaf/20 text-mtg-accent' 
-                             : 'text-[#d0d4c5] hover:bg-white/5 hover:text-mtg-accentHover'
-                           }`}
-                       >
-                         <span className="font-sans text-lg">{rule.name}</span>
-                         <span className="text-xs font-fantasy text-gray-600 group-hover:text-mtg-leaf/80 transition-colors">
-                           {rule.id}
-                         </span>
-                       </button>
-                     </li>
-                   );
-                 })}
-               </ul>
-             ) : (
-               <div className="px-6 py-4 text-center text-gray-500 italic font-sans">
-                 No arcana found matching your query.
-               </div>
-             )}
+             <ul className="max-h-60 overflow-y-auto py-1 scrollbar-thin scrollbar-thumb-mtg-border scrollbar-track-transparent">
+                {/* Always show "Ask Oracle" if there is input */}
+                {query.length > 0 && (
+                   <li className="border-b border-mtg-border/30">
+                     <button
+                       onClick={handleCustomSubmit}
+                       className="w-full text-left px-6 py-3 transition-colors flex items-center gap-3 text-mtg-eclipse hover:bg-white/5 hover:text-mtg-accent"
+                     >
+                       <span className="text-lg">🔮</span>
+                       <div className="flex flex-col">
+                         <span className="font-fantasy text-sm font-bold tracking-wider uppercase">Ask the Oracle</span>
+                         <span className="text-xs text-gray-400 font-sans italic truncate max-w-[300px]">"{query}"</span>
+                       </div>
+                     </button>
+                   </li>
+                )}
+
+                {/* Filtered Rules */}
+                {filteredRules.length > 0 ? (
+                   filteredRules.map((rule) => {
+                     const isSelected = rule.id === selectedId;
+                     return (
+                       <li key={rule.id}>
+                         <button
+                           onClick={() => handleSelect(rule)}
+                           className={`w-full text-left px-6 py-3 transition-colors flex justify-between items-center group
+                             ${isSelected 
+                               ? 'bg-mtg-leaf/20 text-mtg-accent' 
+                               : 'text-[#d0d4c5] hover:bg-white/5 hover:text-mtg-accentHover'
+                             }`}
+                         >
+                           <span className="font-sans text-lg">{rule.name}</span>
+                           <span className="text-xs font-fantasy text-gray-600 group-hover:text-mtg-leaf/80 transition-colors">
+                             {rule.id}
+                           </span>
+                         </button>
+                       </li>
+                     );
+                   })
+                 ) : (
+                   query.length === 0 && (
+                     <div className="px-6 py-4 text-center text-gray-500 italic font-sans text-sm">
+                       Start typing to search...
+                     </div>
+                   )
+                 )}
+             </ul>
           </div>
         )}
       </div>

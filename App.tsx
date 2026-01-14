@@ -8,6 +8,7 @@ import RuleDisplay from './components/RuleDisplay';
 const App: React.FC = () => {
   const [rules, setRules] = useState<RuleItem[]>([]);
   const [selectedRuleId, setSelectedRuleId] = useState<string>('');
+  const [customRule, setCustomRule] = useState<RuleItem | null>(null);
   const [status, setStatus] = useState<LoadingState>(LoadingState.IDLE);
   const [errorMsg, setErrorMsg] = useState<string>('');
   
@@ -29,15 +30,46 @@ const App: React.FC = () => {
     loadData();
   }, []);
 
-  const selectedRule = useMemo(() => 
-    rules.find(r => r.id === selectedRuleId), 
-  [rules, selectedRuleId]);
+  const selectedRule = useMemo(() => {
+    if (selectedRuleId === 'custom' && customRule) {
+      return customRule;
+    }
+    return rules.find(r => r.id === selectedRuleId);
+  }, [rules, selectedRuleId, customRule]);
+
+  const handleCustomQuery = (query: string) => {
+    // Check if user typed an exact name of an existing rule
+    const existing = rules.find(r => r.name.toLowerCase() === query.toLowerCase());
+    if (existing) {
+      setSelectedRuleId(existing.id);
+      setCustomRule(null);
+    } else {
+      // Create a temporary rule for the query
+      const tempRule: RuleItem = {
+        id: 'custom',
+        name: query,
+        fullText: [], // Empty text triggers the "Question/Judge" mode in Gemini
+        category: '701' // Placeholder
+      };
+      setCustomRule(tempRule);
+      setSelectedRuleId('custom');
+    }
+  };
 
   const handleCacheUpdate = (ruleId: string, explanation: string) => {
+    // For custom queries, we cache by the query name (stored in name) to avoid collisions if ID is always 'custom'
+    const key = ruleId === 'custom' && customRule ? `custom-${customRule.name}` : ruleId;
+    
     setExplanationCache(prev => ({
       ...prev,
-      [ruleId]: explanation
+      [key]: explanation
     }));
+  };
+
+  const getCachedExplanation = () => {
+    if (!selectedRule) return undefined;
+    const key = selectedRule.id === 'custom' ? `custom-${selectedRule.name}` : selectedRule.id;
+    return explanationCache[key];
   };
 
   return (
@@ -113,7 +145,8 @@ const App: React.FC = () => {
                <RuleSelector 
                  rules={rules}
                  selectedId={selectedRuleId}
-                 onSelect={setSelectedRuleId}
+                 onSelect={(id) => { setSelectedRuleId(id); setCustomRule(null); }}
+                 onCustomQuery={handleCustomQuery}
                  disabled={false}
                />
             </div>
@@ -122,7 +155,7 @@ const App: React.FC = () => {
               <div className="animate-slide-up transition-all duration-500 ease-out">
                 <RuleDisplay 
                   rule={selectedRule}
-                  cachedExplanation={explanationCache[selectedRule.id]}
+                  cachedExplanation={getCachedExplanation()}
                   onCache={(explanation) => handleCacheUpdate(selectedRule.id, explanation)}
                 />
               </div>
@@ -133,7 +166,7 @@ const App: React.FC = () => {
                 </div>
                 <p className="text-3xl font-fantasy text-mtg-leaf/80 mb-2">The Grimoire is Closed</p>
                 <p className="text-lg font-sans text-gray-500 italic max-w-md">
-                  "Knowledge grows like a wild vine. Select a seed from the list above to verify its nature."
+                  "Knowledge grows like a wild vine. Select a seed from the list above or ask the Oracle a question."
                 </p>
               </div>
             )}

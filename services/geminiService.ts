@@ -12,26 +12,52 @@ export const explainRule = async (ruleName: string, ruleText: string): Promise<s
   try {
     const ai = getClient();
     
-    const prompt = `
-      Jesteś ekspertem Magic: The Gathering. Wyjaśniasz mechanikę "${ruleName}".
-      
-      Tekst źródłowy:
-      ${ruleText}
+    const isCustomQuery = !ruleText || ruleText.trim().length === 0;
 
-      INSTRUKCJE STYLU (BEZWZGLĘDNE):
-      1. NIE UŻYWAJ żadnych powitań ("Witaj", "Cześć").
-      2. NIE PRZEDSTAWIAJ SIĘ ("Jako sędzia...", "Oto wyjaśnienie...").
-      3. Zacznij od razu od konkretnego wyjaśnienia. Bądź zwięzły.
-      4. Wyświetlane odpowiedzi bedą w oknie w telefonie, więc bądź w odpowiedziach wizualny.
-      5. Używaj kolorów i odpowiedniego formatowania, aby odpowiedź nie była ścianą tekstu.
-      6. Bądź czytelny w odpowiedzi. Używaj przerw pomiędzy strukturami w odpowiedzi.
-      7. Jeśli to pomoże, używaj kolorów.
+    let prompt = '';
 
-      STRUKTURA ODPOWIEDZI:
-      1. Pierwsze zdanie ma jak najkrocej podsumowac zdolnosc.
-      2. Wyjaśnienie "po ludzku" jak to działa (krótko i na temat).
-      3. Prosty przykład sytuacji z gry.
-    `;
+    if (isCustomQuery) {
+      // Prompt for custom questions (e.g., "Can I stifle a fetchland?")
+      prompt = `
+        Jesteś sędzią Magic: The Gathering. Użytkownik zadał pytanie lub wpisał nazwę karty/mechaniki, której nie ma w podstawowym spisie CR.
+        
+        Pytanie/Temat: "${ruleName}"
+
+        INSTRUKCJE STYLU:
+        1. NIE UŻYWAJ powitań.
+        2. Odpowiedz konkretnie na pytanie.
+        3. Jeśli to pytanie o interakcję, wyjaśnij ją krok po kroku.
+        4. Jeśli to pytanie o nieznany keyword, wyjaśnij go.
+        5. Używaj formatowania (bold, listy), aby odpowiedź była czytelna na telefonie.
+        
+        STRUKTURA:
+        1. Bezpośrednia odpowiedź (Tak/Nie/Działa to tak...).
+        2. Krótkie uzasadnienie z zasad (jeśli znasz odpowiednie reguły).
+        3. Przykład (opcjonalnie, jeśli to skomplikowane).
+      `;
+    } else {
+      // Standard prompt for existing CR rules
+      prompt = `
+        Jesteś ekspertem Magic: The Gathering. Wyjaśniasz mechanikę "${ruleName}".
+        
+        Tekst źródłowy:
+        ${ruleText}
+
+        INSTRUKCJE STYLU (BEZWZGLĘDNE):
+        1. NIE UŻYWAJ żadnych powitań ("Witaj", "Cześć").
+        2. NIE PRZEDSTAWIAJ SIĘ ("Jako sędzia...", "Oto wyjaśnienie...").
+        3. Zacznij od razu od konkretnego wyjaśnienia. Bądź zwięzły.
+        4. Wyświetlane odpowiedzi bedą w oknie w telefonie, więc bądź w odpowiedziach wizualny.
+        5. Używaj kolorów i odpowiedniego formatowania, aby odpowiedź nie była ścianą tekstu.
+        6. Bądź czytelny w odpowiedzi. Używaj przerw pomiędzy strukturami w odpowiedzi.
+        7. Jeśli to pomoże, używaj kolorów.
+
+        STRUKTURA ODPOWIEDZI:
+        1. Pierwsze zdanie ma jak najkrocej podsumowac zdolnosc.
+        2. Wyjaśnienie "po ludzku" jak to działa (krótko i na temat).
+        3. Prosty przykład sytuacji z gry.
+      `;
+    }
 
     // ---------------------------------------------------------
     // KONFIGURACJA MODELU (MODEL CONFIGURATION)
@@ -43,7 +69,7 @@ export const explainRule = async (ruleName: string, ruleText: string): Promise<s
     // ---------------------------------------------------------
     
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview', // <--- TU ZMIENIASZ MODEL
+      model: 'gemini-3-flash-preview', 
       contents: prompt,
     });
 
