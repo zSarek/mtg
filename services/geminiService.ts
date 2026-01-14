@@ -29,11 +29,15 @@ export const explainRule = async (ruleName: string, ruleText: string): Promise<s
         3. Jeśli to pytanie o interakcję, wyjaśnij ją krok po kroku.
         4. Jeśli to pytanie o nieznany keyword, wyjaśnij go.
         5. Używaj formatowania (bold, listy), aby odpowiedź była czytelna na telefonie.
+        6. Bądź czytelny w odpowiedzi. Używaj przerw pomiędzy strukturami w odpowiedzi.
+        7. Jeśli to pomoże, używaj kolorów w tekście i emoji.
+        8. Zamiast {G/W} {B} uzywaj ikonek kul w odpowiednim kolorze.
         
         STRUKTURA:
         1. Bezpośrednia odpowiedź (Tak/Nie/Działa to tak...).
-        2. Krótkie uzasadnienie z zasad (jeśli znasz odpowiednie reguły).
-        3. Przykład (opcjonalnie, jeśli to skomplikowane).
+        2. Pierwsze zdanie ma jak najkrocej podsumowac zdolnosc.
+        3. Krótkie uzasadnienie z zasad (jeśli znasz odpowiednie reguły).
+        4. Przykład (opcjonalnie, jeśli to skomplikowane).
       `;
     } else {
       // Standard prompt for existing CR rules
@@ -46,11 +50,12 @@ export const explainRule = async (ruleName: string, ruleText: string): Promise<s
         INSTRUKCJE STYLU (BEZWZGLĘDNE):
         1. NIE UŻYWAJ żadnych powitań ("Witaj", "Cześć").
         2. NIE PRZEDSTAWIAJ SIĘ ("Jako sędzia...", "Oto wyjaśnienie...").
-        3. Zacznij od razu od konkretnego wyjaśnienia. Bądź zwięzły.
+        3. Zacznij od razu od konkretnego wyjaśnienia. Bądź bardzo zwięzły.
         4. Wyświetlane odpowiedzi bedą w oknie w telefonie, więc bądź w odpowiedziach wizualny.
         5. Używaj kolorów i odpowiedniego formatowania, aby odpowiedź nie była ścianą tekstu.
         6. Bądź czytelny w odpowiedzi. Używaj przerw pomiędzy strukturami w odpowiedzi.
-        7. Jeśli to pomoże, używaj kolorów.
+        7. Jeśli to pomoże, używaj kolorów w tekście i emoji.
+        8. Zamiast {G/W} {B} uzywaj ikonek kul w odpowiednim kolorze.
 
         STRUKTURA ODPOWIEDZI:
         1. Pierwsze zdanie ma jak najkrocej podsumowac zdolnosc.

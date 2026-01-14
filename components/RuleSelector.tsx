@@ -104,7 +104,7 @@ const RuleSelector: React.FC<Props> = ({ rules, selectedId, onSelect, onCustomQu
             }}
             onFocus={() => setIsOpen(true)}
             onKeyDown={handleKeyDown}
-            placeholder="Search keyword or ask a question..."
+            placeholder="Search keyword..."
             className="block w-full rounded-lg border border-mtg-border bg-[#152225] py-4 pl-12 pr-12 text-mtg-accent shadow-2xl transition-all duration-300
                        focus:border-mtg-accent focus:ring-1 focus:ring-mtg-accent focus:outline-none 
                        placeholder-gray-600 font-sans text-xl tracking-wide"
@@ -141,9 +141,32 @@ const RuleSelector: React.FC<Props> = ({ rules, selectedId, onSelect, onCustomQu
         {isOpen && !disabled && (
           <div className="absolute mt-2 w-full rounded-lg border border-mtg-border/60 bg-[#0f1216]/95 backdrop-blur-md shadow-card overflow-hidden z-50 animate-fade-in">
              <ul className="max-h-60 overflow-y-auto py-1 scrollbar-thin scrollbar-thumb-mtg-border scrollbar-track-transparent">
-                {/* Always show "Ask Oracle" if there is input */}
+                
+                {/* 1. Filtered Rules First */}
+                {filteredRules.map((rule) => {
+                    const isSelected = rule.id === selectedId;
+                    return (
+                    <li key={rule.id}>
+                        <button
+                        onClick={() => handleSelect(rule)}
+                        className={`w-full text-left px-6 py-3 transition-colors flex justify-between items-center group
+                            ${isSelected 
+                            ? 'bg-mtg-leaf/20 text-mtg-accent' 
+                            : 'text-[#d0d4c5] hover:bg-white/5 hover:text-mtg-accentHover'
+                            }`}
+                        >
+                        <span className="font-sans text-lg">{rule.name}</span>
+                        <span className="text-xs font-fantasy text-gray-600 group-hover:text-mtg-leaf/80 transition-colors">
+                            {rule.id}
+                        </span>
+                        </button>
+                    </li>
+                    );
+                })}
+
+                {/* 2. Ask Oracle Last (if input exists) */}
                 {query.length > 0 && (
-                   <li className="border-b border-mtg-border/30">
+                   <li className={`border-mtg-border/30 ${filteredRules.length > 0 ? 'border-t' : ''}`}>
                      <button
                        onClick={handleCustomSubmit}
                        className="w-full text-left px-6 py-3 transition-colors flex items-center gap-3 text-mtg-eclipse hover:bg-white/5 hover:text-mtg-accent"
@@ -157,35 +180,12 @@ const RuleSelector: React.FC<Props> = ({ rules, selectedId, onSelect, onCustomQu
                    </li>
                 )}
 
-                {/* Filtered Rules */}
-                {filteredRules.length > 0 ? (
-                   filteredRules.map((rule) => {
-                     const isSelected = rule.id === selectedId;
-                     return (
-                       <li key={rule.id}>
-                         <button
-                           onClick={() => handleSelect(rule)}
-                           className={`w-full text-left px-6 py-3 transition-colors flex justify-between items-center group
-                             ${isSelected 
-                               ? 'bg-mtg-leaf/20 text-mtg-accent' 
-                               : 'text-[#d0d4c5] hover:bg-white/5 hover:text-mtg-accentHover'
-                             }`}
-                         >
-                           <span className="font-sans text-lg">{rule.name}</span>
-                           <span className="text-xs font-fantasy text-gray-600 group-hover:text-mtg-leaf/80 transition-colors">
-                             {rule.id}
-                           </span>
-                         </button>
-                       </li>
-                     );
-                   })
-                 ) : (
-                   query.length === 0 && (
+                {/* 3. Empty State (Only if no input) */}
+                {query.length === 0 && (
                      <div className="px-6 py-4 text-center text-gray-500 italic font-sans text-sm">
                        Start typing to search...
                      </div>
-                   )
-                 )}
+                )}
              </ul>
           </div>
         )}
