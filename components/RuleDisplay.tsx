@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { RuleItem } from '../types';
 import { explainRule } from '../services/geminiService';
 import LoadingSpinner from './LoadingSpinner';
+import CardTooltip from './CardTooltip';
 
 interface Props {
   rule: RuleItem;
@@ -53,19 +54,31 @@ const RuleDisplay: React.FC<Props> = ({ rule, cachedExplanation, onCache }) => {
     await fetchExplanation();
   };
 
+  // Pre-process the explanation text to convert [[Card Name]] to standard Markdown links
+  // Format: [Card Name](#card:Card%20Name) - Using #card: prevents url sanitization issues
+  const processedContent = useMemo(() => {
+    if (!explanation) return '';
+    return explanation.replace(/\[\[(.*?)\]\]/g, (match, cardName) => {
+      // Encode the card name for the URL-like structure, but keep display text normal
+      return `[${cardName}](#card:${encodeURIComponent(cardName)})`;
+    });
+  }, [explanation]);
+
   return (
-    <div className="w-full max-w-4xl mx-auto relative group perspective-1000">
+    // FIX: Removed 'perspective-1000' and 'group' which created a 3D context that trapped the tooltip z-index
+    <div className="w-full max-w-4xl mx-auto relative">
       
       {/* Decorative Outer Glow */}
-      <div className="absolute -inset-1 bg-gradient-to-br from-mtg-leaf via-black to-mtg-eclipse rounded-xl blur opacity-30 group-hover:opacity-50 transition duration-1000"></div>
+      <div className="absolute -inset-1 bg-gradient-to-br from-mtg-leaf via-black to-mtg-eclipse rounded-xl blur opacity-30 transition duration-1000"></div>
 
       {/* Main Card Container - Stone/Parchment Texture */}
-      <div className="relative bg-[#162021] rounded-xl shadow-card border border-mtg-border/60 overflow-hidden backdrop-blur-sm">
+      {/* FIX: Ensure z-index is handled naturally, removed 3D transform logic */}
+      <div className="relative bg-[#162021] rounded-xl shadow-card border border-mtg-border/60 backdrop-blur-sm">
         
         {/* Header Section */}
-        <div className="relative bg-[#0f1216] border-b border-[#2d4a3e] px-8 py-6 flex justify-between items-start">
+        <div className="relative bg-[#0f1216] border-b border-[#2d4a3e] px-8 py-6 flex justify-between items-start rounded-t-xl">
           {/* Top Border Gradient */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-mtg-leaf via-mtg-accent to-mtg-eclipse"></div>
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-mtg-leaf via-mtg-accent to-mtg-eclipse rounded-t-xl"></div>
           
           <div className="z-10 w-full">
              <h2 className="text-3xl sm:text-4xl font-fantasy font-bold text-mtg-text tracking-wider drop-shadow-md break-words">
@@ -113,10 +126,10 @@ const RuleDisplay: React.FC<Props> = ({ rule, cachedExplanation, onCache }) => {
         )}
 
         {/* AI Interpretation Section (The "Spell") */}
-        <div className={`bg-[#121518] relative border-mtg-border/50 min-h-[120px] ${!isCustom ? 'border-t' : ''}`}>
+        <div className={`bg-[#121518] relative border-mtg-border/50 min-h-[120px] rounded-b-xl ${!isCustom ? 'border-t' : ''}`}>
           
           {/* Magical Texture Overlay */}
-          <div className="absolute inset-0 opacity-[0.05]" 
+          <div className="absolute inset-0 opacity-[0.05] rounded-b-xl" 
                style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}>
           </div>
 
@@ -160,7 +173,7 @@ const RuleDisplay: React.FC<Props> = ({ rule, cachedExplanation, onCache }) => {
                  <div className="h-px bg-mtg-eclipse flex-grow opacity-50"></div>
                </div>
 
-              {/* Markdown Content - Text sized to text-base */}
+              {/* Markdown Content */}
               <div className="prose prose-invert max-w-none 
                 prose-headings:font-fantasy prose-headings:text-mtg-accent prose-headings:tracking-wide
                 prose-strong:text-indigo-300 prose-strong:font-bold
@@ -173,10 +186,20 @@ const RuleDisplay: React.FC<Props> = ({ rule, cachedExplanation, onCache }) => {
                       <blockquote className="border-l-4 border-mtg-eclipse bg-black/20 p-4 my-4 rounded-r italic text-gray-400" {...props} />
                     ),
                     p: ({node, ...props}) => <p className="text-justify mb-4 last:mb-0 leading-7 text-[#e0e0d0] font-sans text-base" {...props} />,
-                    li: ({node, ...props}) => <li className="text-justify mb-1 text-[#e0e0d0] font-sans text-base" {...props} />
+                    li: ({node, ...props}) => <li className="text-justify mb-1 text-[#e0e0d0] font-sans text-base" {...props} />,
+                    // Custom Link Renderer for Cards
+                    a: ({node, href, children, ...props}) => {
+                      // Check for #card: prefix which is safe from markdown sanitization
+                      if (href && href.startsWith('#card:')) {
+                        // Decode the name back from the URL
+                        const cardName = decodeURIComponent(href.replace('#card:', ''));
+                        return <CardTooltip cardName={cardName}>{children}</CardTooltip>;
+                      }
+                      return <a href={href} className="text-mtg-accent hover:underline" target="_blank" rel="noopener noreferrer" {...props}>{children}</a>;
+                    }
                   }}
                 >
-                  {explanation}
+                  {processedContent}
                 </ReactMarkdown>
               </div>
               

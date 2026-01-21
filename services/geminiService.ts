@@ -32,6 +32,11 @@ export const explainRule = async (ruleName: string, ruleText: string): Promise<s
         6. Bądź czytelny w odpowiedzi. Używaj przerw pomiędzy strukturami w odpowiedzi.
         7. Jeśli to pomoże, używaj kolorów w tekście i emoji.
 
+        LINKOWANIE KART (BARDZO WAŻNE):
+        Jeśli w swojej odpowiedzi wymieniasz nazwę konkretnej karty Magic: The Gathering (np. Black Lotus, Shock, Tarmogoyf), MUSISZ otoczyć ją podwójnymi nawiasami kwadratowymi.
+        Przykład: "Kiedy zagrywasz [[Lightning Bolt]], możesz..."
+        Dzięki temu aplikacja wyświetli obrazek karty.
+
         WIZUALIZACJA KOLORÓW MANY:
         1. Zamiast {G/W} {B} uzywaj ikonek kul w odpowiednim kolorze:
           Plains - żółty
@@ -66,6 +71,10 @@ export const explainRule = async (ruleName: string, ruleText: string): Promise<s
         7. Jeśli to pomoże, używaj kolorów w tekście i emoji.
         8. Zamiast {G/W} {B} uzywaj ikonek kul w odpowiednim kolorze.
         9. WAŻNE! Zwracaj uwage na ilość uniwersalnej (colorless) many, pokazuj ją jako liczbę, albo szarą kulę.
+        
+        LINKOWANIE KART (BARDZO WAŻNE):
+        Jeśli w przykładach wymieniasz nazwę konkretnej karty (np. Grizzly Bears), MUSISZ otoczyć ją podwójnymi nawiasami kwadratowymi.
+        Przykład: "Jeśli stwór np. [[Grizzly Bears]] blokuje..."
         
         WIZUALIZACJA KOLORÓW MANY:
         1. Zamiast {G/W} {B} uzywaj ikonek kul w odpowiednim kolorze:
