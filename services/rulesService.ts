@@ -2,6 +2,9 @@ import { RuleItem, RuleParsingState } from '../types';
 
 // Źródło online - tylko najnowsza wersja
 const ONLINE_SOURCE = 'https://media.wizards.com/2026/downloads/MagicCompRules%2020260116.txt';
+// Nazwa pliku lokalnego (musi znajdować się w folderze public/ lub obok index.html po buildzie)
+const LOCAL_SOURCE = './rules2026.txt'; 
+
 const STORAGE_KEY = 'mtg_rules_text_cache';
 const STORAGE_VERSION = '20260116';
 
@@ -28,37 +31,42 @@ export const fetchAndParseRules = async (): Promise<RuleItem[]> => {
   let text = '';
   let lastError: any;
 
-  // 2. Network Fetch Strategies
-  // We use multiple proxies because they can be unreliable or slow.
+  // 2. Network/Local Fetch Strategies
+  // Priority: 
+  // 1. Local file (rules2026.txt) - Fastest, avoids CORS and Proxy latency.
+  // 2. Proxies - Fallback if local file is missing.
   const strategies = [
-    // Primary: AllOrigins
+    // Strategy A: Local File
+    () => LOCAL_SOURCE,
+    // Strategy B: Primary Proxy (AllOrigins)
     (url: string) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-    // Secondary: CorsProxy.io
+    // Strategy C: Secondary Proxy (CorsProxy.io)
     (url: string) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-    // Tertiary: Direct (works if user has CORS extension)
-    (url: string) => url
   ];
 
   for (const strategy of strategies) {
     try {
-      const fetchUrl = strategy(ONLINE_SOURCE);
+      const fetchUrl = strategy(ONLINE_SOURCE); // Note: For local strategy, ONLINE_SOURCE is ignored
       console.log(`[RulesService] Attempting to fetch rules from: ${fetchUrl}`);
       
       // Increased timeout to 15s for large text files/slow proxies
+      // Local fetch usually takes <100ms
       text = await fetchTextWithTimeout(fetchUrl, 15000);
       
       if (isValidRulesText(text)) {
-        console.log(`[RulesService] Download success.`);
+        console.log(`[RulesService] Download success from ${fetchUrl}.`);
         // Cache the successful download
         try {
           localStorage.setItem(STORAGE_KEY, text);
           localStorage.setItem(STORAGE_KEY + '_ver', STORAGE_VERSION);
         } catch (e) { /* ignore quota errors */ }
         
-        break; // Stop trying other proxies
+        break; // Stop trying other sources
+      } else {
+        console.warn(`[RulesService] Downloaded text from ${fetchUrl} was invalid (too short or wrong format).`);
       }
     } catch (error) {
-      console.warn(`[RulesService] Strategy failed.`, error);
+      console.warn(`[RulesService] Strategy failed for ${strategy.name || 'unknown'}.`, error);
       lastError = error;
       // Continue to next strategy
     }
@@ -67,7 +75,7 @@ export const fetchAndParseRules = async (): Promise<RuleItem[]> => {
   // 3. Validation
   if (!isValidRulesText(text)) {
     const msg = lastError instanceof Error ? lastError.message : "Unknown error";
-    throw new Error(`Failed to load rules from any source. Please check your internet connection. (Last error: ${msg})`);
+    throw new Error(`Failed to load rules. Please ensure 'rules2026.txt' is in the root directory or check your internet connection for fallback. (Last error: ${msg})`);
   }
 
   return parseAndValidate(text);
@@ -84,8 +92,16 @@ const parseAndValidate = (text: string): RuleItem[] => {
 
 const isValidRulesText = (text: string | null | undefined): boolean => {
   if (!text || typeof text !== 'string') return false;
-  // Basic check: length and content check
-  return text.length > 50000 && !text.includes('<!DOCTYPE') && !text.includes('<html');
+  
+  // Basic check: content check.
+  // We lowered the limit slightly to 1000 chars to allow for testing with smaller valid files if needed,
+  // but real CR is huge (>5MB).
+  if (text.length < 1000) return false;
+
+  // Security/Format check
+  if (text.includes('<!DOCTYPE') || text.includes('<html')) return false;
+
+  return true;
 };
 
 const fetchTextWithTimeout = async (url: string, timeoutMs: number): Promise<string> => {
