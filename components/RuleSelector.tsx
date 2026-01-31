@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { RuleItem } from '../types';
 
 interface Props {
@@ -38,15 +38,21 @@ const RuleSelector: React.FC<Props> = ({ rules, selectedId, onSelect, onCustomQu
   }, []);
 
   // Filter rules based on query
-  const filteredRules = query === ''
-    ? rules.sort((a, b) => a.name.localeCompare(b.name))
-    : rules.filter((rule) => {
-        const lowerQuery = query.toLowerCase();
-        return (
-          rule.name.toLowerCase().includes(lowerQuery) ||
-          rule.id.includes(lowerQuery)
-        );
-      }).sort((a, b) => a.name.localeCompare(b.name));
+  // CRITICAL FIX: Use useMemo and sort a COPY of the array.
+  // Sorting in place (rules.sort) mutates the prop and causes React render loops/crashes.
+  const filteredRules = useMemo(() => {
+    const list = query === ''
+      ? rules
+      : rules.filter((rule) => {
+          const lowerQuery = query.toLowerCase();
+          return (
+            rule.name.toLowerCase().includes(lowerQuery) ||
+            rule.id.includes(lowerQuery)
+          );
+        });
+    
+    return [...list].sort((a, b) => a.name.localeCompare(b.name));
+  }, [rules, query]);
 
   const handleSelect = (rule: RuleItem) => {
     onSelect(rule.id);
@@ -62,8 +68,6 @@ const RuleSelector: React.FC<Props> = ({ rules, selectedId, onSelect, onCustomQu
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      // If there is exactly one match that looks like what user typed, select it
-      // Otherwise, assume custom query
       const exactMatch = filteredRules.find(r => r.name.toLowerCase() === query.toLowerCase());
       if (exactMatch) {
         handleSelect(exactMatch);
