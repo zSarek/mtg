@@ -2,7 +2,7 @@ import { RuleItem, RuleParsingState } from '../types';
 
 // The URL has a space in the filename, represented as %20 in browsers.
 // We define it with a space here so encodeURIComponent handles it correctly once.
-const RULES_URL = 'https://media.wizards.com/2025/downloads/MagicCompRules 20251114.txt';
+const RULES_URL = 'https://media.wizards.com/2026/downloads/MagicCompRules%2020260116.txt';
 
 // Manually added rules that might be missing from the parsed section (701/702) or are from new sets not yet in the CR text.
 const MANUAL_RULES: RuleItem[] = [
